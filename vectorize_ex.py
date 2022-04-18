@@ -1,3 +1,4 @@
+from pydoc import doc
 from pymongo import MongoClient
 import nltk
 from sklearn.feature_extraction.text import TfidfVectorizer
