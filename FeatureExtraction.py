@@ -24,15 +24,16 @@ def dictVec(collection):
 def concat_and_save(collection):
     features_vec = dictVec(collection)
     text_vec = utils.vectorize_all(collection)
-    full_vec = scipy.sparse.hstack(features_vec, text_vec)
+    full_vec = scipy.sparse.hstack((features_vec, text_vec))
     scipy.sparse.save_npz('sparse_matrix.npz', full_vec)
 
-# concat_and_save(client['test-database']['test-collection'])
+concat_and_save(client['test-database']['test-collection'])
 # collection = client['test-database']['test-collection']
 # scipy.sparse.save_npz('features.npz', dictVec(collection))
 # scipy.sparse.save_npz('text.npz', utils.vectorize_all(collection))
-features = scipy.sparse.load_npz('features.npz')
-text = scipy.sparse.load_npz('text.npz')
-full_vec = scipy.sparse.hstack(features, text)
+# features = scipy.sparse.load_npz('features.npz')
+# text = scipy.sparse.load_npz('text.npz')
+# full_vec = scipy.sparse.hstack((features, text))
+# print(full_vec)
 # print(features.getformat())
 # print(text.getformat())
