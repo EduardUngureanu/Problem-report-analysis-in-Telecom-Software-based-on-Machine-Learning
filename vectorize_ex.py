@@ -13,7 +13,8 @@ stemmed_text = nltk.Text(stemmed_tokens)
 
 stemmed_vectorizer = TfidfVectorizer()
 X = stemmed_vectorizer.fit_transform(stemmed_text)
-print(stemmed_vectorizer.get_feature_names_out())
+# print(stemmed_vectorizer.get_feature_names_out())
+print(X)
 
 # raw_text = nltk.Text(tokens)
 # raw_vectorizer = TfidfVectorizer()
