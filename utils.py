@@ -1,3 +1,4 @@
+from curses import curs_set
 from pydoc import doc
 from typing import Collection
 from pymongo import MongoClient
@@ -5,6 +6,7 @@ import nltk
 from nltk import word_tokenize
 from nltk.tokenize.treebank import TreebankWordDetokenizer
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn import preprocessing
 
 def tokenize_desc(client : MongoClient):
     db = client['test-database']
@@ -42,12 +44,22 @@ def vectorize_all(collection):
         text = TreebankWordDetokenizer.detokenize(twd, document['stemmedTokens'])
         list.append(text)
     vectorizer = TfidfVectorizer()
-    x = vectorizer.fit_transform(list)
-    return x
+    sparse_matrix = vectorizer.fit_transform(list)
+    return sparse_matrix
+
+def label_encode_gic(collection):
+    gic_list = []
+    cursor = collection.find({})
+    for document in cursor:
+        gic_list.append(document['groupInCharge'])
+    le = preprocessing.LabelEncoder()
+    encoded_gic = le.fit_transform(gic_list)
+    return encoded_gic
 
 client = MongoClient('localhost', 27017)
 # stemm_to_text(client['test-database']['test-collection'])
 # text = nltk.Text(client['test-database']['test-collection'].find_one({})['stemmedTokens'])
 # tokens = client['test-database']['test-collection'].find_one({})['tokens']
 # print(TreebankWordDetokenizer.detokenize(TreebankWordDetokenizer(), tokens))
-vectorize_all(client['test-database']['test-collection'])
+# vectorize_all(client['test-database']['test-collection'])
+print(label_encode_gic(client['test-database']['test-collection']))
