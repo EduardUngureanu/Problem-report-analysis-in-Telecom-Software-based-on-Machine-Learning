@@ -1,12 +1,18 @@
+import scipy.sparse
 from curses import curs_set
 from pydoc import doc
 from typing import Collection
-from pymongo import MongoClient
+import numpy
+
 import nltk
 from nltk import word_tokenize
 from nltk.tokenize.treebank import TreebankWordDetokenizer
-from sklearn.feature_extraction.text import TfidfVectorizer
+from pymongo import MongoClient
 from sklearn import preprocessing
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+
 
 def tokenize_desc(client : MongoClient):
     db = client['test-database']
@@ -56,10 +62,23 @@ def label_encode_gic(collection):
     encoded_gic = le.fit_transform(gic_list)
     return encoded_gic
 
+def gaussian_ml():
+
+    X = scipy.sparse.load_npz('sparse_matrix.npz').toarray()
+    X = numpy.nan_to_num(X,posinf=0.0,neginf=0.0)
+    y = label_encode_gic(client['test-database']['test-collection'])
+    X_train, X_test, y_train, y_test = train_test_split(X,y)
+    gnb = GaussianNB()
+    y_pred = gnb.fit(X_train,y_train).predict(X_test) 
+    print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
+
+
 client = MongoClient('localhost', 27017)
+gaussian_ml()
+
 # stemm_to_text(client['test-database']['test-collection'])
 # text = nltk.Text(client['test-database']['test-collection'].find_one({})['stemmedTokens'])
 # tokens = client['test-database']['test-collection'].find_one({})['tokens']
 # print(TreebankWordDetokenizer.detokenize(TreebankWordDetokenizer(), tokens))
 # vectorize_all(client['test-database']['test-collection'])
-print(label_encode_gic(client['test-database']['test-collection']))
+# print(label_encode_gic(client['test-database']['test-collection']))
