@@ -8,26 +8,30 @@ import utils
 
 client = MongoClient('localhost', 27017)
 
-def dictVec(collection):
+def dict_vec(collection):
     list = []
     cursor = collection.find({})
-    data = ['author', 'build', 'feature', 'authorGroup', 'release']
+    data = [ 'build', 'feature', 'release']
     for document in cursor:
         dict = {}
         for x in data:
             dict[x] = document[x]
+            #dict comprehension
         list.append(dict)
     vec = DictVectorizer()
     x = vec.fit_transform(list)
     return x
 
+#refactor variabile
+
 def concat_and_save(collection):
-    features_vec = dictVec(collection)
+    features_vec = dict_vec(collection)
     text_vec = utils.vectorize_all(collection)
     full_vec = scipy.sparse.hstack((features_vec, text_vec))
     scipy.sparse.save_npz('sparse_matrix.npz', full_vec)
 
 concat_and_save(client['test-database']['test-collection'])
+print("done")
 # collection = client['test-database']['test-collection']
 # scipy.sparse.save_npz('features.npz', dictVec(collection))
 # scipy.sparse.save_npz('text.npz', utils.vectorize_all(collection))
