@@ -8,29 +8,28 @@ import utils
 
 client = MongoClient('localhost', 27017)
 
-def dict_vec(collection):
-    list = []
+# Extracts the desired features from the database and performs vectorization on them using DictVectorizer
+def features_vectorize(collection):
+    full_feature_list = []
     cursor = collection.find({})
-    data = [ 'build', 'feature', 'release']
+    features_to_extract = ['build', 'feature', 'release']
     for document in cursor:
-        dict = {}
-        for x in data:
-            dict[x] = document[x]
-            #dict comprehension
-        list.append(dict)
+        feature_dict = {key:value for (key, value) in document.items() if key in features_to_extract}
+        full_feature_list.append(feature_dict)
+    print(full_feature_list)
     vec = DictVectorizer()
-    x = vec.fit_transform(list)
-    return x
+    sparse_matrix = vec.fit_transform(full_feature_list)
+    return sparse_matrix
 
-#refactor variabile
-
+# Concatenate the vectorized feature list to the vectorized text and save them to a file called "sparse_matrix.npz"
 def concat_and_save(collection):
-    features_vec = dict_vec(collection)
+    features_vec = features_vectorize(collection)
     text_vec = utils.vectorize_all(collection)
     full_vec = scipy.sparse.hstack((features_vec, text_vec))
     scipy.sparse.save_npz('sparse_matrix.npz', full_vec)
 
-concat_and_save(client['test-database']['test-collection'])
+# concat_and_save(client['test-database']['test-collection'])
+features_vectorize(client['test-database']['test-collection'])
 print("done")
 # collection = client['test-database']['test-collection']
 # scipy.sparse.save_npz('features.npz', dictVec(collection))
