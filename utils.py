@@ -83,10 +83,10 @@ def label_encode_gic(collection):
     cursor = collection.find({})
     for document in cursor:
         gic = document['groupInCharge'].split('_',1)[0]
-        if (gic != 'MOAM' or gic !='BOAM'):
+        if (gic != 'MANO' or gic !='BOAM'):
             gic_list.append('not_boam')
         else:
-            if gic == 'MOAN':
+            if gic == 'MANO':
                 gic_list.append('BOAM')
             else:
                 gic_list.append(gic)            
