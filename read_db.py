@@ -27,9 +27,9 @@ client = MongoClient('localhost', 27017)
 db = client['test-database']
 collection = db['test-collection']
 
-# grp_in_charge_occurance(client)
+grp_in_charge_occurance(client)
 # feature_list(client)
 # cnn_percent(client)
-nr_of_atachments(client)
+# nr_of_atachments(client)
 
 client.close()
