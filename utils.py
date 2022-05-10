@@ -78,10 +78,18 @@ def concat_and_save(collection):
 
 # Encode the categorical groups in charge into labels
 def label_encode_gic(collection):
+    gic_dict = {}
     gic_list = []
     cursor = collection.find({})
     for document in cursor:
-        gic_list.append(document['groupInCharge'])
+        gic = document['groupInCharge'].split('_',1)[0]
+        if (gic != 'MOAM' or gic !='BOAM'):
+            gic_list.append('not_boam')
+        else:
+            if gic == 'MOAN':
+                gic_list.append('BOAM')
+            else:
+                gic_list.append(gic)            
     label_encoder = preprocessing.LabelEncoder()
     encoded_gic = label_encoder.fit_transform(gic_list)
     return encoded_gic
@@ -92,13 +100,14 @@ def gaussian_ml():
     target = label_encode_gic(client['test-database']['test-collection'])
     vf_train, vf_test, target_train, target_test = train_test_split(vectorized_features, target)
     gnb = GaussianNB()
-    target_pred = gnb.fit(vf_train,target_train).predict(vf_test) 
+    target_pred = gnb.fit(vf_train,target_train).predict(vf_test)
     print("Number of mislabeled points out of a total %d points : %d" % (vf_test.shape[0], (target_test != target_pred).sum()))
 
 client = MongoClient('localhost', 27017)
 
 if __name__ == "__main__":
-    exit()
+    gaussian_ml()
+    #print(len(label_encode_gic(client['test-database']['test-collection'])))
 
 # stemm_to_text(client['test-database']['test-collection'])
 # text = nltk.Text(client['test-database']['test-collection'].find_one({})['stemmedTokens'])
